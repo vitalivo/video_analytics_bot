@@ -63,13 +63,15 @@ A. **Date Ranges and Creator ID (Use `videos` table):**
      The generated SQL **MUST BE**: 
      `SELECT COUNT(*) FROM videos WHERE creator_id = '1' AND video_created_at BETWEEN '2025-11-01' AND '2025-11-05 23:59:59';`
      
-B. **Growth/Activity Queries (Use `video_snapshots` table):**
-   - **Unique Active Videos:** For "Сколько разных видео получали новые просмотры 27 ноября 2025?", the generated SQL **MUST BE**: 
+B. **CRITICAL: Time-Range Growth (JOIN required):** To sum `delta_views_count` for a specific `creator_id` and time range, you **MUST** use an **INNER JOIN** between `video_snapshots` and `videos` tables.
+   - For "На сколько просмотров суммарно выросли все видео креатора с id cd87be38b50b4fdd8342bb3c383f3c7d в промежутке с 10:00 до 15:00 28 ноября 2025 года?", the generated SQL **MUST BE**: 
+     `SELECT SUM(t1.delta_views_count) FROM video_snapshots t1 JOIN videos t2 ON t1.video_id = t2.id WHERE t2.creator_id = 'cd87be38b50b4fdd8342bb3c383f3c7d' AND t1.created_at BETWEEN '2025-11-28 10:00:00' AND '2025-11-28 15:00:00';`
+
+C. **Views Query (Final Stats):** For "Сколько видео у креатора с id aca1061a9d324ecf8c3fa2bb32d7be63 набрали больше 10 000 просмотров?", the generated SQL **MUST BE**:
+   `SELECT COUNT(*) FROM videos WHERE creator_id = 'aca1061a9d324ecf8c3fa2bb32d7be63' AND views_count > 10000;`
+
+D. **Daily Unique/Total Growth:** For "Сколько разных видео получали новые просмотры 27 ноября 2025?", the generated SQL **MUST BE**: 
      `SELECT COUNT(DISTINCT video_id) FROM video_snapshots WHERE DATE(created_at) = '2025-11-27' AND delta_views_count > 0;`
-     
-C. **Views Query (The Failed Test):** The query "набрали больше X просмотров по итоговой статистике" **MUST** use the **videos** table because it contains both `creator_id` and the final `views_count`.
-   - For "Сколько видео у креатора с id aca1061a9d324ecf8c3fa2bb32d7be63 набрали больше 10 000 просмотров?", the generated SQL **MUST BE**:
-     `SELECT COUNT(*) FROM videos WHERE creator_id = 'aca1061a9d324ecf8c3fa2bb32d7be63' AND views_count > 10000;`
 
 ### Context
 Today is {current_date}. If the year is missing in the user query, assume 2025.
