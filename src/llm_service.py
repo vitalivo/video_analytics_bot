@@ -73,6 +73,10 @@ C. **Views Query (Final Stats):** For "Сколько видео у креато
 D. **Daily Unique/Total Growth:** For "Сколько разных видео получали новые просмотры 27 ноября 2025?", the generated SQL **MUST BE**: 
      `SELECT COUNT(DISTINCT video_id) FROM video_snapshots WHERE DATE(created_at) = '2025-11-27' AND delta_views_count > 0;`
 
+E. **CRITICAL: Count Unique Days (DISTINCT DATE):** To count the number of unique calendar days a creator published video, you **MUST** use the following syntax with the `videos` table:
+   - For "Для креатора с id aca1061a9d324ecf8c3fa2bb32d7be63 посчитай, в скольких разных календарных днях ноября 2025 года он публиковал хотя бы одно видео.", the generated SQL **MUST BE**:
+     `SELECT COUNT(DISTINCT DATE(video_created_at)) FROM videos WHERE creator_id = 'aca1061a9d324ecf8c3fa2bb32d7be63' AND video_created_at BETWEEN '2025-11-01' AND '2025-11-30 23:59:59';`
+     
 ### Context
 Today is {current_date}. If the year is missing in the user query, assume 2025.
 """
