@@ -1,0 +1,12 @@
+# Конфигурация
+.env
+
+# Локальные файлы Python
+__pycache__/
+*.pyc
+
+# Логи
+*.log
+
+# Docker
+.dockerignore
